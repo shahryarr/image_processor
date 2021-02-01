@@ -1,11 +1,9 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
+
 -- Create Date:    11:08:21 01/28/2021 
 -- Design Name: 
 -- Module Name:    image_processor - arch
--- Project Name: 
+-- Project Name: filter image
 -- Target Devices: 
 -- Tool versions: 
 -- Description: 
@@ -31,7 +29,7 @@ entity image_processor is
 			  done_tick : out STD_LOGIC;
            output : out  STD_LOGIC_VECTOR (7 downto 0));
 end image_processor;
-
+----------------------------------------------------------------------------------
 architecture arch of image_processor is
 
 type pixel_type is array (0 to 2**N-1 , 0 to 2**N-1) of unsigned(7 downto 0);
@@ -56,7 +54,7 @@ signal state_reg , state_next : state_type;
 signal row_reg , row_next : unsigned(9 downto 0);
 signal column_reg , column_next : unsigned(9 downto 0);
 signal i , j : integer;
-
+----------------------------------------------------------------------------------
 begin
 	process(clk, reset)
 	begin
@@ -70,7 +68,7 @@ begin
 			column_reg <= column_next;
 		end if;
 	end process;
-	
+--------------------------------------------------------------
 	process(state_reg , row_reg , column_reg , start , input)
 	begin
 		done_tick <= '0';
@@ -79,7 +77,7 @@ begin
 		column_next <= column_reg;
 		
 		case state_reg is
-		
+		---------------------------------------
 			when idle =>
 				if start = '1' then
 					state_next <= waite;
@@ -88,9 +86,9 @@ begin
 					i <= 1;
 					j <= 1;
 				end if;
-
+		---------------------------------------
 			when waite =>
-				pixel(to_integer(row_reg) , to_integer(column_reg)) <= input;
+				pixel(to_integer(row_reg) , to_integer(column_reg)) <= unsigned(input);
 				if (column_reg = 2 and row_reg = 2) then
 					state_next <= op;
 					row_next <= row_reg + 1;
@@ -100,9 +98,9 @@ begin
 				else
 					row_next <= row_reg + 1;
 				end if;
-
+		---------------------------------------
 			when op =>
-				pixel(to_integer(row_reg) , to_integer(column_reg)) <= input;
+				pixel(to_integer(row_reg) , to_integer(column_reg)) <= unsigned(input);
 				filtered(i,j) <= pixel(i,j)*mask(1,1) - pixel(i-1,j)*mask(0,1) - pixel(i,j-1)*mask(1,0) - pixel(i+1,j)*mask(2,1) - pixel(i,j+1)*mask(1,2);
 				
 				if (j = to_integer(unsigned(column)-2) and i = to_integer(unsigned(row)-2)) then
@@ -123,15 +121,16 @@ begin
 					row_next <= row_reg + 1;
 				end if;
 			
-						
+		---------------------------------------		
 			when done =>
 				done_tick <=  '1';
-				
+				state_next <= idle;
 				
 		end case;
 	end process;
-	
---output <= std_logic_vector(filtered(to_integer(row_reg) , to_integer(column_reg)));
+--------------------------------------------------------------
+
+output <= std_logic_vector(filtered(i , j));
 	
 end arch;
 
