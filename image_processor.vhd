@@ -19,7 +19,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity image_processor is
-	generic ( N : integer := 10);
+	generic ( N : integer := 4);
     Port ( clk : in  STD_LOGIC;
 			  reset : in STD_LOGIC;
            start : in  STD_LOGIC;
@@ -51,8 +51,8 @@ type state_type is (idle , waite , op , done);
 
 signal state_reg , state_next : state_type;
 
-signal row_reg , row_next : unsigned(9 downto 0);
-signal column_reg , column_next : unsigned(9 downto 0);
+signal row_reg , row_next : unsigned(N-1 downto 0);
+signal column_reg , column_next : unsigned(N-1 downto 0);
 signal i , j : integer;
 ----------------------------------------------------------------------------------
 begin
@@ -102,6 +102,12 @@ begin
 			when op =>
 				pixel(to_integer(row_reg) , to_integer(column_reg)) <= unsigned(input);
 				filtered(i,j) <= pixel(i,j)*mask(1,1) - pixel(i-1,j)*mask(0,1) - pixel(i,j-1)*mask(1,0) - pixel(i+1,j)*mask(2,1) - pixel(i,j+1)*mask(1,2);
+			
+				if (filtered(i,j)) < 0 then
+					filtered(i,j) <= to_unsigned(0,8);
+				elsif (filtered(i,j) > 255) then
+					filtered(i,j) <= to_unsigned(255,8);
+				end if;
 				
 				if (j = to_integer(unsigned(column)-2) and i = to_integer(unsigned(row)-2)) then
 					state_next <= done;
