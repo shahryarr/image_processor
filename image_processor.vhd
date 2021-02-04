@@ -72,7 +72,7 @@ begin
 		end if;
 	end process;
 --------------------------------------------------------------
-	process(state_reg , row_reg , column_reg , start , input)
+	process(state_reg , row_reg , column_reg , start , input , pos , neg)
 	begin
 		done_tick <= '0';
 		state_next <= state_reg;
