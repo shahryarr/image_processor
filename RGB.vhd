@@ -32,7 +32,7 @@ entity RGB is
 			  blue : in  STD_LOGIC_VECTOR (7 downto 0);
            row : in  STD_LOGIC_VECTOR (N-1 downto 0);
            column : in  STD_LOGIC_VECTOR (N-1 downto 0);
-			  --done_tick : out STD_LOGIC;
+			  done_tick : out STD_LOGIC;
 			  red_out : out  STD_LOGIC_VECTOR (7 downto 0);
 			  green_out : out  STD_LOGIC_VECTOR (7 downto 0);
            blue_out: out  STD_LOGIC_VECTOR (7 downto 0));
@@ -44,28 +44,28 @@ begin
 red_processor: entity work.image_processor(arch)
 	 PORT MAP (		 clk    => clk,
                    reset    => reset,
+						 start => start,
                    input  => red,
                    row    => row,
                    column => column,
-					  --done_tick => done_tick,
 						 output => red_out);
 ------------------------------------------------------
 green_processor: entity work.image_processor(arch)
 	 PORT MAP (		 clk    => clk,
                    reset    => reset,
+						 start => start,
                    input  => green,
                    row    => row,
                    column => column,
-					  --done_tick => done_tick,
 						 output => green_out);
 ------------------------------------------------------
 blue_processor: entity work.image_processor(arch)
 	 PORT MAP (		 clk    => clk,
                    reset    => reset,
+						 start => start,
                    input  => blue,
                    row    => row,
                    column => column,
-					  --done_tick => done_tick,
 						 output => blue_out);
 						 						 
 
